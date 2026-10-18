@@ -1,6 +1,7 @@
 language: node_js
 node_js:
-  - "6"
+  - "20"
+  - "22"
 
 script:
   - npm run lint
