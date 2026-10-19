@@ -6,7 +6,7 @@ module.exports = {
     config: {
         name: "زواج",
         version: "2.1.0",
-        author: "𝑲𝒂𝒎𝒆𝒍 𝑩𝒐𝒖𝒎𝒓𝒅𝒂𝒔𝒔𝒊 🪻💤",
+        author: "​🐰🌷 𝑲𝒂𝒎𝒆𝒍 𝑩𝒐𝒖𝒎𝒓𝒅𝒂𝒔𝒔𝒊 🎀",
         countDown: 5,
         role: 0,
         description: "بطاقة زواج مدمجة، إما بالرد على شخص أو اختيار شخص عشوائي من القروب",
