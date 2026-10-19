@@ -1,4 +1,3 @@
-Modules = ["nodejs-20"]
 modules = ["nodejs-20"]
 
 [nix]
