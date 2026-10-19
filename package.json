@@ -25,10 +25,11 @@
 	"author": "Avery, David, Maude, Benjamin, UIRI, NTKhang (rebuild)",
 	"license": "MIT",
 	"dependencies": {
+		"axios": "^1.6.8",
 		"https-proxy-agent": "^4.0.0",
 		"mqtt": "^3.0.0",
 		"npmlog": "^1.2.0",
-		"request": "^2.53.0",
+		"tough-cookie": "^4.1.3",
 		"websocket-stream": "^5.5.0"
 	},
 	"engines": {
