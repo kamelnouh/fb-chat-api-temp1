@@ -97,7 +97,7 @@ module.exports.run = async function({ api, event, args }) {
     const buffer = canvas.toBuffer("image/png");
     await fs.writeFile(imagePath, buffer);
 
-    const msg = `👑 **مراسم تتويج أميرة المجموعة!** 💖\n\n👤 **الأميرة المتوجة:** ${targetName}\n📊 **مستوى الدلال والرقة:** ${percentage}%\n\nأميرة الجروب المدللة، هلوها وحيوها يا جماعة! ✨🌸`;
+    const msg = `👑 **مراسم تتويج أميرة المجموعة!** 💖\n\n👤 **الأميرة المتوجة:** ${targetName}\n📊 **مستوى الدلال والرقة:** ${percentage}%\n\nأميرة الجروب المدللة، بوبيا تاعنا ! 🥳✨🌸`;
 
     return api.sendMessage({
       body: msg,
