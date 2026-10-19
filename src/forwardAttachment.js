@@ -42,7 +42,7 @@ module.exports = function (defaultFuncs, api, ctx) {
 				ctx.jar,
 				form
 			)
-			.then(utils.parseAndCheckLogin(ctx.jar, defaultFuncs))
+			.then(utils.parseAndCheckLogin(ctx, defaultFuncs))
 			.then(function (resData) {
 				if (resData.error) {
 					throw resData;
