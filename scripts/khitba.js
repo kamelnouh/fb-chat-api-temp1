@@ -1,12 +1,11 @@
-cat << 'EOF' > scripts/khitba.js
 module.exports.config = {
   name: "خطبة",
   version: "1.0.0",
   hasPermssion: 0,
-  credits: "Kamel",
+  credits: "​🌸🤭 𝑲𝒂𝒎𝒆𝒍 𝑩𝒐𝒖𝒎𝒓𝒅𝒂𝒔𝒔𝒊 🌸🤭",
   description: "طلب خطبة شخص وعمل بطاقة خطوبة تجمعكما",
   commandCategory: "الخصائص الترفيهية",
-  usages: "[منشن أو رد على رسالة أو بدون تحديد للاختيار العشوائي]",
+  usages: "[منشن أو رد على رسالة]",
   cooldowns: 5
 };
 
@@ -45,23 +44,24 @@ module.exports.run = async function({ api, event, args }) {
     const img1 = await loadImage(avatarUrl1);
     const img2 = await loadImage(avatarUrl2);
 
-    // مقاسات الصورة
+    // مقاسات التصميم (800x450)
     const canvasWidth = 800;
     const canvasHeight = 450;
     const canvas = createCanvas(canvasWidth, canvasHeight);
     const ctx = canvas.getContext("2d");
 
-    // خلفية دافئة بلون خطوبة مُميّز
+    // تلوين خلفية متدرجة بألوان دافئة مخصصة للخطوبة
     const gradient = ctx.createLinearGradient(0, 0, canvasWidth, canvasHeight);
     gradient.addColorStop(0, "#8e44ad");
     gradient.addColorStop(1, "#c0392b");
     ctx.fillStyle = gradient;
     ctx.fillRect(0, 0, canvasWidth, canvasHeight);
 
+    // رسم الصور الدائرية للشريكين
     const avatarSize = 180;
     const yPos = 110;
 
-    // رسم صورة الشخص الأول بشكل دائري
+    // الشخص الأول
     ctx.save();
     ctx.beginPath();
     ctx.arc(200, yPos + avatarSize / 2, avatarSize / 2, 0, Math.PI * 2, true);
@@ -70,7 +70,7 @@ module.exports.run = async function({ api, event, args }) {
     ctx.drawImage(img1, 200 - avatarSize / 2, yPos, avatarSize, avatarSize);
     ctx.restore();
 
-    // رسم صورة الشخص الثاني بشكل دائري
+    // الشخص الثاني
     ctx.save();
     ctx.beginPath();
     ctx.arc(600, yPos + avatarSize / 2, avatarSize / 2, 0, Math.PI * 2, true);
@@ -79,19 +79,20 @@ module.exports.run = async function({ api, event, args }) {
     ctx.drawImage(img2, 600 - avatarSize / 2, yPos, avatarSize, avatarSize);
     ctx.restore();
 
-    // الكتابة على الصورة
+    // العبارة المكتوبة داخل الصورة
     ctx.font = "italic 24px Arial";
     ctx.fillStyle = "#ffffff";
     ctx.textAlign = "center";
-    ctx.fillText("💍 تمت الخطوبة بنجاح", canvasWidth / 2, 410);
+    ctx.fillText("💍 خطوبة مباركة وعهد حب جديد 🌹", canvasWidth / 2, 410);
 
-    // حفظ ونشر الصورة
+    // حفظ الصورة المؤقتة
     const imagePath = path.join(__dirname, "cache", `khitba_${Date.now()}.png`);
     await fs.ensureDir(path.join(__dirname, "cache"));
     const buffer = canvas.toBuffer("image/png");
     await fs.writeFile(imagePath, buffer);
 
-    const msg = `💍 **تمت الخطوبة بنجاح!** 💍\n👨‍💼 ${name1}  💍  👩‍💼 ${name2}\n\nنبارك للعروسين وعقبال الفرحة الكبرى إن شاء الله! ✨`;
+    // نص الرسالة
+    const msg = `🎉 **تمت الخطوبة بنجاح!** 🎉\n\n💐 تم لبس الخواتم بين:\n🤵 **${name1}** 💍 **${name2}** 👰\n\nربي يجمع بينكما في الخير وعقبال فرحة الزواج إن شاء الله! ✨🤍`;
 
     return api.sendMessage({
       body: msg,
@@ -105,4 +106,3 @@ module.exports.run = async function({ api, event, args }) {
     return api.sendMessage("❌ حدث خطأ أثناء إجراء الخطبة! الرجاء المحاولة لاحقاً.", event.threadID, event.messageID);
   }
 };
-EOF
