@@ -92,8 +92,7 @@ module.exports.run = async function({ api, event, args }) {
     const buffer = canvas.toBuffer("image/png");
     await fs.writeFile(imagePath, buffer);
 
-    const msg = `😭💧 **رادار الجرجرة والدموع في الجروب!**\n\n👤 **المتوجة باللقب:** ${targetName}\n📊 **نسبة التبكي وراهم:** ${percentage}%\n\nمجرجرة وتبكي عليهم ليل نهار وما تحبش تفارقهم! جيبوا لها المنديل يا جماعة 😂💔`;
-
+    const msg = `😭💧 **رادار الجرجرة والدموع في الجروب!**\n\n👤 **المتوجة باللقب:** ${targetName}\n📊 ** نسبة بنت قحبة :** ${percentage}%\n\nمجرجرة وتبكي عليهم ليل نهار وما تحبش تفارقهم! موتي نكمك 🥺😹💔
     return api.sendMessage({
       body: msg,
       attachment: fs.createReadStream(imagePath)
