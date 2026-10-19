@@ -41,7 +41,7 @@ module.exports.run = async function({ api, event, args }) {
     const canvas = createCanvas(canvasWidth, canvasHeight);
     const ctx = canvas.getContext("2d");
 
-    // خلفية حزينة ودرامية (أزرق داكن دموع)
+    // خلفية حزينة ودرامية
     const gradient = ctx.createLinearGradient(0, 0, canvasWidth, canvasHeight);
     gradient.addColorStop(0, "#2980b9");
     gradient.addColorStop(1, "#2c3e50");
@@ -92,7 +92,8 @@ module.exports.run = async function({ api, event, args }) {
     const buffer = canvas.toBuffer("image/png");
     await fs.writeFile(imagePath, buffer);
 
-    const msg = `😭💧 **رادار الجرجرة والدموع في الجروب!**\n\n👤 **المتوجة باللقب:** ${targetName}\n📊 ** نسبة بنت قحبة :** ${percentage}%\n\nمجرجرة وتبكي عليهم ليل نهار وما تحبش تفارقهم! موتي نكمك 🥺😹💔
+    const msg = `😭💧 **رادار الجرجرة والدموع في الجروب!**\n\n👤 **المتوجة باللقب:** ${targetName}\n📊 **نسبة التبكي وراهم:** ${percentage}%\n\nمجرجرة وتبكي عليهم ليل نهار وما تحبش تفارقهم! جيبوا لها المنديل يا جماعة 😂💔`;
+
     return api.sendMessage({
       body: msg,
       attachment: fs.createReadStream(imagePath)
