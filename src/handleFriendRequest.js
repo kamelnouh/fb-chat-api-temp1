@@ -28,6 +28,7 @@ module.exports = function (defaultFuncs, api, ctx) {
 		}
 
 		const form = {
+			uid: userID,
 			viewer_id: ctx.i_userID || ctx.userID,
 			"frefs[0]": "jwl",
 			floc: "friend_center_requests",
@@ -43,7 +44,7 @@ module.exports = function (defaultFuncs, api, ctx) {
 			)
 			.then(utils.parseAndCheckLogin(ctx, defaultFuncs))
 			.then(function (resData) {
-				if (resData.payload.err) {
+				if (resData.payload && resData.payload.err) {
 					throw {
 						err: resData.payload.err
 					};
