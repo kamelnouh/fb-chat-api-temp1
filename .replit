@@ -1,7 +1,9 @@
-modules = ["nodejs-20"]
+Modules = ["nodejs-20"]
 
 [nix]
 channel = "stable-25_05"
 
 [agent]
 expertMode = true
+
+run = "node index.js"
