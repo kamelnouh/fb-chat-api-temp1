@@ -1,9 +1,9 @@
 module.exports.config = {
   name: "دراما",
-  version: "1.0.0",
+  version: "2.1.0",
   hasPermssion: 0,
   credits: "𝑲𝒂𝒎𝒆𝒍 𝑩𝒐𝒖𝒎𝒓𝒅𝒂𝒔𝒔𝒊 🪻💤",
-  description: "تتويج دراما كوين المجموعة وتحديد نسبة التكبير والمسلسلات",
+  description: "تتويج ملك أو ملكة الدراما في المجموعة وتحديد نسبة البكاء والتكبير",
   commandCategory: "الخصائص الترفيهية",
   usages: "[منشن أو رد على رسالة]",
   cooldowns: 5
@@ -18,7 +18,7 @@ module.exports.run = async function({ api, event, args }) {
     let targetID;
     if (event.type === "message_reply") {
       targetID = event.messageReply.senderID;
-    } else if (Object.keys(event.mentions).length > 0) {
+    } else if (Object.keys(event.mentions || {}).length > 0) {
       targetID = Object.keys(event.mentions)[0];
     } else {
       const threadInfo = await api.getThreadInfo(event.threadID);
@@ -30,7 +30,12 @@ module.exports.run = async function({ api, event, args }) {
     }
 
     const userInfo = await api.getUserInfo(targetID);
-    const targetName = userInfo[targetID].name;
+    const targetUser = userInfo[targetID] || {};
+    const targetName = targetUser.name || "الشخص المستهدف";
+    
+    // تحديد الجنس (Gender: 1 أنثى, 2 ذكر)
+    const targetGender = targetUser.gender === 1 ? "female" : "male";
+
     const percentage = Math.floor(Math.random() * 101);
 
     const avatarUrl = `https://graph.facebook.com/${targetID}/picture?height=500&width=500&access_token=6628568379%CC%1e620fa708a1d5696fb991c1bde5662`;
@@ -41,10 +46,15 @@ module.exports.run = async function({ api, event, args }) {
     const canvas = createCanvas(canvasWidth, canvasHeight);
     const ctx = canvas.getContext("2d");
 
-    // خلفية سينمائية
+    // خلفية سينمائية تتغير حسب الجنس
     const gradient = ctx.createLinearGradient(0, 0, canvasWidth, canvasHeight);
-    gradient.addColorStop(0, "#4A154B");
-    gradient.addColorStop(1, "#571845");
+    if (targetGender === "male") {
+      gradient.addColorStop(0, "#2c3e50");
+      gradient.addColorStop(1, "#34495e");
+    } else {
+      gradient.addColorStop(0, "#4A154B");
+      gradient.addColorStop(1, "#571845");
+    }
     ctx.fillStyle = gradient;
     ctx.fillRect(0, 0, canvasWidth, canvasHeight);
 
@@ -60,7 +70,8 @@ module.exports.run = async function({ api, event, args }) {
     ctx.drawImage(avatarImg, xPos, yPos, avatarSize, avatarSize);
     ctx.restore();
 
-    ctx.strokeStyle = "#ff7979";
+    const strokeColor = targetGender === "male" ? "#3498db" : "#ff7979";
+    ctx.strokeStyle = strokeColor;
     ctx.lineWidth = 8;
     ctx.beginPath();
     ctx.arc(canvasWidth / 2, yPos + avatarSize / 2, avatarSize / 2, 0, Math.PI * 2, true);
@@ -77,22 +88,33 @@ module.exports.run = async function({ api, event, args }) {
     ctx.fill();
 
     const fillWidth = (barWidth * percentage) / 100;
-    ctx.fillStyle = "#ff7979";
+    ctx.fillStyle = strokeColor;
     ctx.beginPath();
     ctx.roundRect(barX, barY, fillWidth, barHeight, 14);
     ctx.fill();
 
-    ctx.font = "bold 28px Arial";
+    ctx.font = "bold 26px Arial";
     ctx.fillStyle = "#ffffff";
     ctx.textAlign = "center";
-    ctx.fillText(`دراما كوين المجموعة: ${percentage}% 🎭`, canvasWidth / 2, 490);
+    ctx.fillText(targetGender === "male" ? `دراما كينغ المجموعة: ${percentage}% 🎭` : `دراما كوين المجموعة: ${percentage}% 🎭`, canvasWidth / 2, 455);
+
+    // الحقوق المزخرفة داخل البطاقة
+    ctx.font = "bold 16px Arial";
+    ctx.fillStyle = "#f1c40f";
+    ctx.fillText("𝑲𝒂𝒎𝒆𝒍 𝑩𝒐𝒖𝒎𝒓𝒅𝒂𝒔𝒔𝒊 🪻💤", canvasWidth / 2, 515);
 
     const imagePath = path.join(__dirname, "cache", `drama_${Date.now()}.png`);
     await fs.ensureDir(path.join(__dirname, "cache"));
     const buffer = canvas.toBuffer("image/png");
     await fs.writeFile(imagePath, buffer);
 
-    const msg = `🎭 **لقب دراما كوين المجموعة!** 🎬\n\n👤 **المتوجة باللقب:** ${targetName}\n📊 **نسبة الدراما والتكبير:** ${percentage}%\n\nتدير مسلسل تركي كامل من حكاية صغيرة وموضوع فارغ! 😂🎬`;
+    // النصوص والعبارات حسب الطلب
+    let msg = "";
+    if (targetGender === "male") {
+      msg = `🎭 **دراما كينغ المجموعة!** 🎬\n\n👤 **المتوج باللقب:** ${targetName}\n📊 **نسبة البكاء والتكبير:** ${percentage}%\n\nmتبكيش عمري 🥺🥳😂 تدير مسلسل تركي كامل على حاجة فارغة!`;
+    } else {
+      msg = `🎭 **دراما كوين المجموعة!** 🎬\n\n👤 **المتوجة باللقب:** ${targetName}\n📊 **نسبة الدراما والتكبير:** ${percentage}%\n\nبكايا خانها كلبها طحان 😹😹🤭 خلاص متبكيش بهدلتينا 🥺💔😂`;
+    }
 
     return api.sendMessage({
       body: msg,
