@@ -1,19 +1,15 @@
-const login = require("./index.js");
-const fs = require("fs");
 
-if (!fs.existsSync("./appstate.json")) {
-  console.error("ملف appstate.json غير موجود!");
-  process.exit(1);
-}
+const fs = require("fs");
+const login = require("facebook-chat-api");
 
 let appState;
 
 try {
   appState = JSON.parse(
-    fs.readFileSync("./appstate.json", "utf8")
+    fs.readFileSync("appstate.json", "utf8")
   );
 } catch (err) {
-  console.error("ملف appstate.json غير صالح أو فيه خطأ.");
+  console.error("خطأ في قراءة appstate.json:", err.message);
   process.exit(1);
 }
 
@@ -23,7 +19,7 @@ login({ appState }, (err, api) => {
     return;
   }
 
-  console.log("البوت راه يخدم!");
+  console.log("تم تشغيل البوت بنجاح!");
 
   api.listenMqtt((err, event) => {
     if (err) {
@@ -37,7 +33,7 @@ login({ appState }, (err, api) => {
         event.threadID,
         (sendErr) => {
           if (sendErr) {
-            console.error("فشل إرسال الرد:", sendErr);
+            console.error("فشل إرسال الرسالة:", sendErr);
           }
         }
       );
