@@ -2,7 +2,11 @@
 
 const login = require("./index");
 const fs = require("fs");
-const path = require("path");
+const path = path = require("path");
+
+// قراءة ملف الإعدادات config.json لاستخراج الـ prefix
+const config = JSON.parse(fs.readFileSync("./config.json", "utf8"));
+const PREFIX = config.prefix || "!"; // إذا ما لقاهوش يدير "!\" كافتراضي
 
 const appState = JSON.parse(
   fs.readFileSync("./appstate.json", "utf8")
@@ -48,7 +52,11 @@ login({ appState }, {}, async (err, api) => {
     const body = (event.body || "").trim();
     if (!body) return;
 
-    const args = body.split(/\s+/);
+    // 🛑 التحقق مما إذا كانت الرسالة تبدأ بالـ prefix المحدد في config.json
+    if (!body.startsWith(PREFIX)) return;
+
+    // حذف الـ prefix من بداية النص واستخراج اسم الأمر والـ args
+    const args = body.slice(PREFIX.length).trim().split(/\s+/);
     const commandName = args.shift().toLowerCase();
 
     const command = commands.get(commandName);
