@@ -4,10 +4,10 @@ const { createCanvas, loadImage } = require("canvas");
 
 module.exports.config = {
   name: "اميرة",
-  version: "2.0.0",
+  version: "3.1.0",
   hasPermssion: 0,
   credits: "𝑲𝒂𝒎𝒆𝒍 𝑩𝒐𝒖𝒎𝒓𝒅𝒂𝒔𝒔𝒊 🪻💤",
-  description: "تتويج أميرة المجموعة ",
+  description: "تتويج أميرة المجموعة أو التمسخير بين الأعضاء بالحقائق والضحك",
   commandCategory: "الخصائص الترفيهية",
   usages: "[منشن أو رد على رسالة]",
   cooldowns: 5
@@ -31,70 +31,113 @@ module.exports.run = async function({ api, event, args }) {
 
     const senderID = event.senderID;
 
-    // جلب معلومات المرسل والمستهدف
+    if (senderID === targetID) {
+      return api.sendMessage("❌ حابة تتوجي روحك أميرة بالسيف؟ روح تغسلي الماعين خيرلك 😂🧹", event.threadID, event.messageID);
+    }
+
+    // جلب معلومات الطرفين
     const userInfo = await api.getUserInfo([senderID, targetID]);
     const senderUser = userInfo[senderID] || {};
     const targetUser = userInfo[targetID] || {};
 
-    const senderName = senderUser.name || "المرسل";
+    const senderName = senderUser.name || "صاحب الأمر";
     const targetName = targetUser.name || "المستهدف";
 
     // تحديد الجنس (1 أنثى, 2 ذكر)
     const senderGender = senderUser.gender === 1 ? "female" : "male";
     const targetGender = targetUser.gender === 1 ? "female" : "male";
 
-    // ==========================================
-    // حالة 1: المستهدف ذَكَر
-    // ==========================================
-    if (targetGender === "male") {
-      const maleTargetScenarios = [
-        // أ) نص مباشر لمرسل الأمر
-        { type: "text", msg: "احشم 😒👍" },
-        // ب) تمنيك بمرسل الأمر لأنه حاول يقنع صاحبه الذكر باللقب
-        { type: "text", msg: `يا واحد طحان بغيت طيح بصاحبك لي ميشبه لوالو 😂😂😂😂🐗\n👤 المقصودين: ${senderName} & ${targetName}` },
-        // ج) تصميم بطاقة تمسخير ساخرة بالذكر المستهدف
-        { 
-          type: "card_roast", 
-          msg: `🐗 **أميرة بوعو والغابات!** 😂💀\n\n👤 **المتوج باللقب:** ${targetName}\n📊 **نسبة الأنوثة والرقة:** 0%\n\nقالك أميرة! روح نحي اللحية وهز الماعين الكوزينة تستنى فيك 😂💔🧹` 
-        }
+    // ===================================================
+    // حالة 1: صاحب الأمر (أُنثى) والمستهدف (أُنثى)
+    // ===================================================
+    if (senderGender === "female" && targetGender === "female") {
+      const option = Math.floor(Math.random() * 3); // 0, 1, أو 2
+
+      if (option === 0) {
+        // أ) التمسخير بلي عطات الأمر (صاحبة الأمر)
+        const msg = `الغيرة تعذب صح 😹🙉\nيا ${senderName} راكي حابة تكوني أميرة في بلاصتها بالسيف؟ روح تعلمي تطبيخ الشربة خيرلك 😂🍲`;
+        return api.sendMessage(msg, event.threadID, event.messageID);
+
+      } else if (option === 1) {
+        // ب) التمسخير بالمستهدفة
+        const msg = `🤡 **أميرة الماعين والمقلة!**\n\n👤 **المقصودة:** ${targetName}\n📊 **نسبة الشبه بالأميرة:** 10%\n\nما تشبهي لراس زبي يا ${targetName}، نحي التاج وطيري للكوزينة حكي القدرة 😂💔🧹`;
+        return await sendAmiraCard({ api, event, targetID, targetName, msg, isRoast: true, percentage: 10 });
+
+      } else {
+        // ج) مدح المستهدفة
+        const percentage = Math.floor(Math.random() * 21) + 80;
+        const msg = `👑 **مراسم تتويج أميرة المجموعة!** 💖\n\n👤 **الأميرة المتوجة:** ${targetName}\n📊 **مستوى الجمال والرقة:** ${percentage}%\n\nأميرة الجروب والزين كامل، بوبيا تاعنا المدللة! 🥳✨🌸`;
+        return await sendAmiraCard({ api, event, targetID, targetName, msg, isRoast: false, percentage });
+      }
+    }
+
+    // ===================================================
+    // حالة 2: صاحب الأمر (أُنثى) والمستهدف (ذَكَر)
+    // ===================================================
+    else if (senderGender === "female" && targetGender === "male") {
+      const maleRoasts = [
+        `🐗 **أميرة بوعو والغابات!** 😂💀\n\n👤 **المتوج باللقب:** ${targetName}\n📊 **نسبة الأنوثة والرقة:** 0%\n\nقالك أميرة! روح نحي اللحية وهز الماعين الكوزينة تستنى فيك يا الشيكور 😂💔🧹`,
+        `🤡 **أميرة الجروب الفاشل!**\n\n👤 **المتوج:** ${targetName}\n\nيا ${targetName} طيحولك الهيبة ورجعوك أميرة الطفلات في الجروب 😂💀🔥`,
+        `📌 **تنبيه رسمـي!**\n\n${targetName} يطلب العطف والرحمة وحاب يولي أميرة بالسيف 😂💔 احشم على شاربك يا راجل 😒👍`
       ];
 
-      const selected = maleTargetScenarios[Math.floor(Math.random() * maleTargetScenarios.length)];
+      const selectedRoast = maleRoasts[Math.floor(Math.random() * maleRoasts.length)];
 
-      if (selected.type === "text") {
-        return api.sendMessage(selected.msg, event.threadID, event.messageID);
+      if (Math.random() < 0.5) {
+        return api.sendMessage(selectedRoast, event.threadID, event.messageID);
       } else {
-        return await sendAmiraCard({ api, event, targetID, targetName, msg: selected.msg, isRoast: true });
+        return await sendAmiraCard({ api, event, targetID, targetName, msg: selectedRoast, isRoast: true, percentage: 0 });
       }
-    } 
-    
-    // ==========================================
-    // حالة 2: المستهدف أُنثى
-    // ==========================================
+    }
+
+    // ===================================================
+    // حالة 3: صاحب الأمر (ذَكَر) والمستهدف (أُنثى) -> سيناريو الحلاب
+    // ===================================================
+    else if (senderGender === "male" && targetGender === "female") {
+      const option = Math.floor(Math.random() * 4); // 0, 1, 2, أو 3
+
+      if (option === 0) {
+        // أ) مدح المستهدفة
+        const percentage = Math.floor(Math.random() * 21) + 80;
+        const msg = `👑 **مراسم تتويج أميرة المجموعة!** 💖\n\n👤 **الأميرة المتوجة:** ${targetName}\n📊 **مستوى الجمال والرقة:** ${percentage}%\n\nأميرة الجروب والزين كامل بفضل المنشن المباشر! 🥳✨🌸`;
+        return await sendAmiraCard({ api, event, targetID, targetName, msg, isRoast: false, percentage });
+
+      } else if (option === 1) {
+        // ب) التمسخير بالمستهدفة
+        const msg = `🥱 **أميرة بدون عرش!**\n\n👤 **المقصودة:** ${targetName}\n📊 **مستوى الجمال:** بالسيف لا لحقتي 15%\n\nشكون قالك باللي أنتِ أميرة؟ وجهك يقطع رزق الزواج يا ${targetName} 😂🤡💔`;
+        return await sendAmiraCard({ api, event, targetID, targetName, msg, isRoast: true, percentage: 15 });
+
+      } else if (option === 2) {
+        // ج) التمسخير بصاحب الأمر وفضحه قدام الجماعة (حلاب)
+        const msg = `🚨 **فضاط للجروب كاملاً!** 🚨\n\nالمدعو **${senderName}** حلاب رسمي ومقطع! 🥛😂\nداير أمر أميرة لـ **${targetName}** باش يتقرب منها ويطيحها! احشم على روحك يا الحلاب بهدلتنا قدام الغاشي 🤡💀🔥`;
+        return api.sendMessage(msg, event.threadID, event.messageID);
+
+      } else {
+        // د) التمسخير بيهم لزوج (صاحب الأمر الحلاب والمستهدفة)
+        const msg = `🤡 **ثنائي التحلاب والكارثة!**\n\n👤 **الحلاب الرسمي:** ${senderName}\n👤 **أميرة الغبرة:** ${targetName}\n\nواحد ينشن ويحلّب والثانية مصدقة روحها باللي صح أميرة! زوج ما يسواوش حبة بطاطا في الجروب 😂🥔💀`;
+        return await sendAmiraCard({ api, event, targetID, targetName, msg, isRoast: true, percentage: 5 });
+      }
+    }
+
+    // ===================================================
+    // حالة 4: صاحب الأمر (ذَكَر) والمستهدف (ذَكَر)
+    // ===================================================
     else {
-      // إمكانية ظهور مقولة "الغيرة تعذب صح" إذا كانت المرسلة أنثى واستهدفت أنثى أخرى
-      if (senderGender === "female" && Math.random() < 0.35) {
-        return api.sendMessage(`الغيرة تعذب صح 😹🙉\nراكي حابة تكوني أميرة في بلاصتها يا ${senderName}؟ 😂💅`, event.threadID, event.messageID);
-      }
+      const maleToMaleOption = Math.floor(Math.random() * 3); // 0, 1, أو 2
 
-      // الاختيار العشوائي بين المدح والتمسخير
-      const isRoast = Math.random() < 0.5;
+      if (maleToMaleOption === 0) {
+        // أ) البوت يقول لصاحب الأمر احشم بدون ثيم
+        return api.sendMessage("احشم 😒👍", event.threadID, event.messageID);
 
-      if (isRoast) {
-        // عبارات تمسخير ساخرة بالأنثى
-        const roastPhrases = [
-          `🤡 **أميرة الماعين والمقلة!**\n\n👤 **المقصودة:** ${targetName}\n📊 **نسبة الشبه بالأميرة:** 10%\n\nما تشبهي لوالو، غير نحي التاج وطيري للكوزينة حكي القدرة 😂💔🧹`,
-          `🥱 **أميرة بدون عرش!**\n\n👤 **المقصودة:** ${targetName}\n📊 **مستوى الجمال:** بالسيف لا لحقتي 15%\n\nشكون قالك باللي أنتِ أميرة؟ وجهك يقطع رزق الزواج 😂🤡💔`
-        ];
+      } else if (maleToMaleOption === 1) {
+        // ب) التمسخير بصاحب الأمر وصاحبه
+        const msg = `يا واحد طحان بغيت طيح بصاحبك لي ميشبه لوالو 😂😂😂😂🐗\n👤 **المقصودين:** ${senderName} & ${targetName}`;
+        return api.sendMessage(msg, event.threadID, event.messageID);
 
-        const randomRoast = roastPhrases[Math.floor(Math.random() * roastPhrases.length)];
-        return await sendAmiraCard({ api, event, targetID, targetName, msg: randomRoast, isRoast: true });
       } else {
-        // عبارات مدح وتحيل بالجمال
-        const percentage = Math.floor(Math.random() * 21) + 80; // بين 80% و 100%
-        const praiseMsg = `👑 **مراسم تتويج أميرة المجموعة!** 💖\n\n👤 **الأميرة المتوجة:** ${targetName}\n📊 **مستوى الجمال والرقة:** ${percentage}%\n\nأميرة الجروب والزين كامل، بوبيا تاعنا المدللة! 🥳✨🌸`;
-
-        return await sendAmiraCard({ api, event, targetID, targetName, msg: praiseMsg, isRoast: false, percentage });
+        // ج) التمسخير بالمستهدف الذكر مع ثيم بطاقة Canvas
+        const msg = `🐗 **أميرة الغابات والأشجار!** 😂💀\n\n👤 **المقصود:** ${targetName}\n📊 **نسبة الأنوثة:** 0%\n\nيا ${targetName} طيحولك قدرك قدام الجروب ورجعوك أميرة! روح نحي الشارب والكوسكة خيرلك 😂💔🧹`;
+        return await sendAmiraCard({ api, event, targetID, targetName, msg, isRoast: true, percentage: 0 });
       }
     }
 
@@ -118,7 +161,7 @@ async function sendAmiraCard({ api, event, targetID, targetName, msg, isRoast, p
   const canvas = createCanvas(canvasWidth, canvasHeight);
   const ctx = canvas.getContext("2d");
 
-  // تحديد خلفية الثيم (وردية ملكية أو مظلمة ساخرة)
+  // خلفية وردية ملونة للمدح أو سوداء ساخرة للتمسخير
   const gradient = ctx.createLinearGradient(0, 0, canvasWidth, canvasHeight);
   if (isRoast) {
     gradient.addColorStop(0, "#2c3e50");
@@ -148,7 +191,7 @@ async function sendAmiraCard({ api, event, targetID, targetName, msg, isRoast, p
   ctx.arc(canvasWidth / 2, yPos + avatarSize / 2, avatarSize / 2, 0, Math.PI * 2, true);
   ctx.stroke();
 
-  // رسم التاج أو الأيقونة فوق الصورة
+  // أيقونة فوق الصورة (تاج أو مهرج)
   ctx.font = "65px Arial";
   ctx.textAlign = "center";
   ctx.fillText(isRoast ? "🤡" : "👑", canvasWidth / 2, 105);
@@ -163,7 +206,7 @@ async function sendAmiraCard({ api, event, targetID, targetName, msg, isRoast, p
   ctx.roundRect(barX, barY, barWidth, barHeight, 14);
   ctx.fill();
 
-  const fillWidth = (barWidth * (isRoast ? 15 : percentage)) / 100;
+  const fillWidth = (barWidth * percentage) / 100;
   ctx.fillStyle = isRoast ? "#e74c3c" : "#d63031";
   ctx.beginPath();
   ctx.roundRect(barX, barY, fillWidth, barHeight, 14);
@@ -172,7 +215,7 @@ async function sendAmiraCard({ api, event, targetID, targetName, msg, isRoast, p
   ctx.font = "bold 26px Arial";
   ctx.fillStyle = "#ffffff";
   ctx.textAlign = "center";
-  ctx.fillText(isRoast ? `معدل الأنوثة: ${isRoast ? 15 : percentage}% 💔` : `أميرة المجموعة رسميًا: ${percentage}% 💖`, canvasWidth / 2, 475);
+  ctx.fillText(isRoast ? `معدل الأنوثة: ${percentage}% 💔` : `أميرة المجموعة رسميًا: ${percentage}% 💖`, canvasWidth / 2, 475);
 
   // الحقوق المزخرفة
   ctx.font = "bold 16px Arial";
