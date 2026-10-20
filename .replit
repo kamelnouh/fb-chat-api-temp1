@@ -6,4 +6,4 @@ channel = "stable-25_05"
 [agent]
 expertMode = true
 
-run = "node Bote.js"
+run = "node bot.js"
